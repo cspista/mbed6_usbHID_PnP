@@ -87,6 +87,6 @@ Start the **HID PnP Demo.exe** application on the PC then connect the MCU card
 After successful connection the atacched state of the device should be TRUE.
 Then the builtin LED (LED1) can be switched on and off by clicking the pushbutton.
 The state of the builtin pushbutton (BUTTON1) as well as the measured voltage 
-will be monitored continouously.
+will be monitored continuously.
 ![](./images/mbed6_usbHID_PNP.png)
 
