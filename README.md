@@ -88,5 +88,5 @@ After successful connection the atacched state of the device should be TRUE.
 Then the builtin LED (LED1) can be switched on and off by clicking the pushbutton.
 The state of the builtin pushbutton (BUTTON1) as well as the measured voltage 
 will be monitored continouously.
-![](./images/mbed6_usbHID_PnP.png)
+![](./images/mbed6_usbHID_PNP.png)
 
