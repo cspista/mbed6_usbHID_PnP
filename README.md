@@ -90,3 +90,75 @@ The state of the builtin pushbutton (BUTTON1) as well as the measured voltage
 will be monitored continuously.
 ![](./images/mbed6_usbHID_PNP.png)
 
+### Using with Python script
+
+Another possibility for testing is the usage of a Python script (besides Python we have to install the **pywinusb** helper module as well)
+The following Python script is a console application which provides a menu for controlling the USB communication with the mbed card.
+
+```python
+from time import sleep
+from msvcrt import kbhit
+
+import pywinusb.hid as hid
+
+def sample_handler(data):
+    print("Raw data: {0}".format(data))
+    if data[1] == 0x81:
+       if data[2] == 0:
+          print("Button is pressed")
+       else:
+          print("Button is not pressed")
+    elif data[1] == 0x37:
+       adc = data[3]*256 + data[2]
+       voltage = int(adc*3300/4096)
+       print("ADC = {0} = {1} mV".format(adc,voltage))   
+
+def send_command(cmd):    # Send the message to the Mbed board
+    # The first byte is the report ID which must be 0
+    buffer = [0 for i in range(65)]  # Array of 65 elements  
+    buffer[1] = cmd
+    #-- print(len(buffer),": ", buffer)
+    out_report = device.find_output_reports()
+    out_report[0].set_raw_data(buffer)
+    out_report[0].send()  
+
+all_devices = hid.HidDeviceFilter(vendor_id = 0x0483, product_id = 0x5750).get_devices()
+
+if not all_devices:
+    raise ValueError("HID device not found")
+
+device = all_devices[0]
+print("Device connected!\r\nSelect option:")
+print("0. Exit")
+print("1. Toggle LED state")
+print("2. Read Button state")
+print("3. Read ADC value")
+
+device.open()
+# Set custom raw data handler
+device.set_raw_data_handler(sample_handler)
+while device.is_plugged():
+    print("\nCommand ('0' to '3') [press Enter after number]: ")
+    while not kbhit() and device.is_plugged():
+        index_option = input()
+        if index_option.isdigit() and int(index_option) < 4:
+            break;
+    ix = int(index_option)
+
+    if ix == 0:
+        device.close()
+        exit()
+        pass
+    elif ix == 1:
+        send_command(0x80)
+        pass
+    elif ix == 2:
+        send_command(0x81)
+        pass
+    elif ix == 3:
+        send_command(0x37)
+        pass
+```
+
+![](./images/usbhid_pnp_py.png)
+
